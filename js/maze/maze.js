@@ -54,7 +54,13 @@ Maze.prototype.primGenerator = function () {
             queue.push(current);
             current = this.boxes[next[0]][next[1]];
         } else {
-            current = queue.pop() || this.unvisited();
+            if (queue.length > 0) {
+                var index = Math.between(0, queue.length - 1);
+                current = queue[index];
+                queue.splice(index, 1);
+            } else {
+                current = this.unvisited();
+            }
         }
     } while (current);
 }

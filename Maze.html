@@ -36,7 +36,7 @@
         create: restart, update: update, render: render
     });
     const levelConfig = [[10, 20], [15, 30], [20, 40], [30, 60], [40, 80], [50, 100]];
-    var level = sessionStorage.level || 0, maze = null, player = null, tips = null;
+    var level = sessionStorage.level || 0, maze = null, player = null, tips = new Tips();;
     function restart() {
         canvas = game.canvas;
         ctx = canvas.getContext("2d");
@@ -55,7 +55,6 @@
             height: maze.boxsize[1],
             maze: maze
         });
-        tips = new Tips();
         event();
     }
     function event() {
@@ -85,7 +84,7 @@
                     tips.display = !tips.display;
                     break;
                 default:
-                    //player.direct = [0, 0];
+                    player.direct = [0, 0];
                     break;
             }
         }
@@ -95,8 +94,6 @@
     }
     function update() {
         player.update(game.time.now - game.time.prevTime);
-        // var position = [player.row, player.col];
-        // maze.nearRoals(position).length === 2
         if (check()) {
             var message = "终于出来了！";
             level++;
