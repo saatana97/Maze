@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Maze</title>
+    <script src="js/utils.js"></script>
+    <script src="phaser-2.6.2/build/phaser.js"></script>
+    <script src="js/maze/res.js"></script>
+    <script src="js/maze/mazeBox.js"></script>
+    <script src="js/maze/maze.js"></script>
+    <script src="js/maze/player.js"></script>
+    <script src="js/maze/tips.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+    </style>
+</head>
+
+<body>
+
+</body>
+<script>
+    const game = new Phaser.Game(document.body.offsetWidth, document.body.offsetHeight, Phaser.CANVAS, "Maze", {
+        create: restart, update: update, render: render
+    });
+    const levelConfig = [[10, 20], [15, 30], [20, 40], [30, 60], [40, 80], [50, 100]];
+    var level = sessionStorage.level || 0, maze = null, player = null, tips = null;
+    function restart() {
+        canvas = game.canvas;
+        ctx = canvas.getContext("2d");
+        maze = new Maze({
+            row: levelConfig[level][0],
+            col: levelConfig[level][1],
+            x: 0,
+            y: 0,
+            width: canvas.width,
+            height: canvas.height
+        });
+        player = new Player({
+            row: maze.entrance.row,
+            col: maze.entrance.col,
+            width: maze.boxsize[0],
+            height: maze.boxsize[1],
+            maze: maze
+        });
+        tips = new Tips();
+        event();
+    }
+    function event() {
+        window.onkeydown = function (e) {
+            switch (e.key) {
+                case "w":
+                case "W":
+                case "ArrowUp":
+                    player.direct = [-1, 0];
+                    break;
+                case "d":
+                case "D":
+                case "ArrowRight":
+                    player.direct = [0, 1];
+                    break;
+                case "s":
+                case "S":
+                case "ArrowDown":
+                    player.direct = [1, 0];
+                    break;
+                case "a":
+                case "A":
+                case "ArrowLeft":
+                    player.direct = [0, -1];
+                    break;
+                case "Escape":
+                    tips.display = !tips.display;
+                    break;
+                default:
+                    //player.direct = [0, 0];
+                    break;
+            }
+        }
+    }
+    function check() {
+        return player.row === maze.endpoint.row && player.col === maze.endpoint.col;
+    }
+    function update() {
+        player.update(game.time.now - game.time.prevTime);
+        // var position = [player.row, player.col];
+        // maze.nearRoals(position).length === 2
+        if (check()) {
+            var message = "终于出来了！";
+            level++;
+            if (level === levelConfig.length) {
+                level--;
+                message = "未完待续";
+            }
+            sessionStorage.level = level;
+            alert(message);
+            restart();
+        }
+    }
+    function render() {
+        maze.render(ctx);
+        player.render(ctx);
+        tips.render(ctx);
+    }
+</script>
+
+</html>
